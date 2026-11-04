@@ -1,28 +1,22 @@
 #pragma once
 #include <string>
-#include <vector>
+#include <fstream>
 #include "Producto.h"
-#include "Cliente.h"
-#include "Pedido.h"
 
 class GestorArchivos {
+private:
+    static void escribirFloat(std::ofstream& out, float valor);
+    static float leerFloat(std::ifstream& in);
+
+    static void escribirInt(std::ofstream& out, int valor);
+    static int leerInt(std::ifstream& in);
+
+    static void escribirString(std::ofstream& out, const std::string& texto);
+    static std::string leerString(std::ifstream& in);
+
 public:
-    void guardarCatalogo(const std::vector<Producto*>& productos,
-                         const std::string& ruta) const;
-    std::vector<Producto*> cargarCatalogo(const std::string& ruta) const;
+    void guardarCatalogoTexto(const std::string& ruta, Producto* productos[], int cantidad) const;
+    int cargarCatalogoTexto(const std::string& ruta, Producto* productos[], int maxCapacidad) const;
 
-    void guardarClientes(const std::vector<Cliente>& clientes,
-                         const std::string& ruta) const;
-    std::vector<Cliente> cargarClientes(const std::string& ruta) const;
-
-    void guardarPedidos(const std::vector<Pedido*>& pedidos,
-                        const std::string& ruta) const;
-    std::vector<Pedido*> cargarPedidos(const std::string& ruta,
-                                       const std::vector<Producto*>& catalogo) const;
-
-    void guardarReporte(const std::vector<Pedido*>& pedidos,
-                        const std::string& ruta) const;
-
-    static void liberarProductos(std::vector<Producto*>& productos);
-    static void liberarPedidos(std::vector<Pedido*>& pedidos);
+    static void liberarProductos(Producto* productos[], int cantidad);
 };
