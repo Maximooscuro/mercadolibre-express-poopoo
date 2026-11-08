@@ -31,4 +31,6 @@ public:
     std::string getEstado() const;
     float getMontoTotal() const;
     const std::vector<DetallePedido*>& getDetalles() const;
+    std::string getFecha() const;
+    void setEstado(const std::string& nuevoEstado);
 };
