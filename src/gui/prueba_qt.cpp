@@ -1,14 +1,12 @@
-//
-// Created by sapuy on 2/11/2026.
-//
-
 #include <QApplication>
-#include <QPushButton>
+#include "VentanaPrincipal.h"
+#include "Estilos.h"
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
-    QPushButton boton("Hola MercadoLibre Express");
-    boton.resize(300, 80);
-    boton.show();
+    app.setStyle("Fusion");               // estilo base uniforme en todos los equipos
+    app.setStyleSheet(estilosApp());      // colores y bordes (QSS)
+    VentanaPrincipal ventana;
+    ventana.show();
     return app.exec();
 }
