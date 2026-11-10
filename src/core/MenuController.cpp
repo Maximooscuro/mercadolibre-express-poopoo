@@ -59,12 +59,7 @@ void MenuController::ejecutar() {
     do {
         mostrarMenuPrincipal();
         cout << "Seleccione una opcion: ";
-        if (!(cin >> opcion)) {
-            cout << "Entrada invalida. Ingrese un numero.\n";
-            cin.clear();
-            cin.ignore(10000, '\n');
-            continue;
-        }
+        opcion=leerEnteroSeguro(1,5);
         switch (opcion) {
             case 1: gestionarProductos(); break;
             case 2: gestionarCategorias(); break;
@@ -133,10 +128,10 @@ void MenuController::gestionarProductos() {
             cout<<"Cantidad a sumar al stock: "; cin>>cantidad;
             bool encontrado = false;
             try {
-                for (auto p : catalogo) {
-                    if (p->getCodigo() == cod) {
-                        p->aumentarStock(cantidad);
-                        cout << "[EXITO] Stock actualizado. Nuevo stock: " << p->getStock() << "\n";
+                for (auto &punteroBusqueda : catalogo) {
+                    if (punteroBusqueda->getCodigo() == cod) {
+                        punteroBusqueda->aumentarStock(cantidad);
+                        cout << "[EXITO] Stock actualizado. Nuevo stock: " << punteroBusqueda->getStock() << "\n";
                         encontrado = true;
                         break;
                     }
@@ -215,9 +210,10 @@ void MenuController::gestionarCategorias() {
     cout << "2. Recargar saldo al cliente actual\n";
     cout << "3. Registrar un nuevo cliente\n";
     cout << "4. Cambiar de cliente (Iniciar sesion con otro)\n";
+    cout << "5. Eliminar un cliente del sistema\n";
     cout << "Seleccione una opcion: ";
 
-    int op = leerEnteroSeguro(1, 4);
+    int op = leerEnteroSeguro(1, 5);
     switch (op) {
         case 1: {
             if (!clienteSesionActual) { cout << "No hay ningun cliente en sesion.\n"; break; }
@@ -248,6 +244,8 @@ void MenuController::gestionarCategorias() {
             cambiarClienteSesion();
             break;
         }
+        case 5: eliminarCliente();
+            break;
     }
 }
 
@@ -365,3 +363,29 @@ void MenuController::cambiarClienteSesion() {
     cout << "[EXITO] Sesion cambiada a: " << clienteSesionActual->getNombre() << "\n";
 }
 
+void MenuController::eliminarCliente() {
+    cout << "\n--- ELIMINAR CLIENTE ---\n";
+    if (listaClientes.empty()) {
+        cout << "No hay clientes registrados.\n";
+        return;
+    }
+
+    cout << "Clientes registrados:\n";
+    for (size_t i = 0; i < listaClientes.size(); ++i) {
+        cout << i + 1 << ". " << listaClientes[i].getNombre() << " (" << listaClientes[i].getCorreo() << ")\n";
+    }
+
+    cout << "Seleccione el numero del cliente a eliminar: ";
+    int index = leerEnteroSeguro(1, (size_t)listaClientes.size());
+
+    // Validar que no borres al cliente que está usando la sesión actual por seguridad
+    Cliente* clienteAEliminar = &listaClientes[index - 1];
+    if (clienteAEliminar == clienteSesionActual) {
+        cout << "[ADVERTENCIA] No puedes eliminar al cliente que esta activo en la sesion actual.\n";
+        return;
+    }
+
+    // Borrar del vector usando un iterador
+    listaClientes.erase(listaClientes.begin() + (index - 1));
+    cout << "[EXITO] Cliente eliminado correctamente del sistema.\n";
+}

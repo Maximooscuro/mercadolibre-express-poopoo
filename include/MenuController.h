@@ -29,6 +29,7 @@ class MenuController {
     void realizarPedido();
     void registrarNuevoCliente();
     void cambiarClienteSesion();
+    void eliminarCliente();
     //funciones auxiliares
     int leerEnteroSeguro(int minVal, int maxVal);
     float leerFlotantePositivo();
