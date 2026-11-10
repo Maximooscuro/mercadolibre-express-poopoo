@@ -3,19 +3,10 @@ project(mercadolibrepoo)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(mercadolibrepoo main.cpp
-        include/Excepciones.h
-        include/ProductoFisico.h
-        include/Producto.h
-        include/ProductoDigital.h
-        include/MetodoPago.h
-        include/TarjetaCredito.h
-        include/TransferenciaBancaria.h
-        include/DetallePedido.h
-        include/Pedido.h
-        include/Cliente.h
-        include/Categoria.h
-        include/ServicioNotificacion.h
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+add_executable(mercadolibrepoo
+        main.cpp
         src/core/Cliente.cpp
         src/core/Categoria.cpp
         src/core/DetallePedido.cpp
@@ -25,4 +16,5 @@ add_executable(mercadolibrepoo main.cpp
         src/core/ProductoFisico.cpp
         src/core/ServicioNotificacion.cpp
         src/core/TarjetaCredito.cpp
-        src/core/TransferenciaBancaria.cpp)
+        src/core/TransferenciaBancaria.cpp
+)

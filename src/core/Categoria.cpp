@@ -1,4 +1,7 @@
 #include "Categoria.h"
+#include <string>
+#include <vector>
+
 #include "Excepciones.h"
 using namespace std;
 
