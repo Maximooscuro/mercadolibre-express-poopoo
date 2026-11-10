@@ -17,4 +17,6 @@ add_executable(mercadolibrepoo
         src/core/ServicioNotificacion.cpp
         src/core/TarjetaCredito.cpp
         src/core/TransferenciaBancaria.cpp
+        include/MenuController.h
+        src/core/MenuController.cpp
 )
