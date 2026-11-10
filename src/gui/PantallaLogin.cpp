@@ -2,8 +2,6 @@
 #include "Mensajes.h"
 #include <QVBoxLayout>
 #include <QFrame>
-#include <QLabel>
-#include <QPushButton>
 
 PantallaLogin::PantallaLogin(std::function<void(const QString&)> ingresar, QWidget* parent)
     : QWidget(parent), alIngresar(ingresar) {
@@ -21,56 +19,82 @@ PantallaLogin::PantallaLogin(std::function<void(const QString&)> ingresar, QWidg
     titulo->setObjectName("titulo");
     titulo->setAlignment(Qt::AlignCenter);
 
-    auto* sub = new QLabel("Bienvenido. Ingrese usuario y contraseña");
-    sub->setObjectName("subtitulo");
-    sub->setAlignment(Qt::AlignCenter);
-    sub->setWordWrap(true);
+    subtitulo = new QLabel();
+    subtitulo->setObjectName("subtitulo");
+    subtitulo->setAlignment(Qt::AlignCenter);
+    subtitulo->setWordWrap(true);
 
     usuario = new QLineEdit();
     usuario->setPlaceholderText("Usuario");
     clave = new QLineEdit();
     clave->setPlaceholderText("Contraseña");
     clave->setEchoMode(QLineEdit::Password);
+    confirmar = new QLineEdit();
+    confirmar->setPlaceholderText("Confirmar contraseña");
+    confirmar->setEchoMode(QLineEdit::Password);
 
-    auto* boton = new QPushButton("Ingresar");
-    boton->setCursor(Qt::PointingHandCursor);
+    botonPrincipal = new QPushButton();
+    botonPrincipal->setCursor(Qt::PointingHandCursor);
 
-    // Ayuda solo para la demostracion; se quita cuando haya usuarios reales
-    auto* ayuda = new QLabel("Demo: admin / admin123   o   cliente / 1234");
-    ayuda->setObjectName("subtitulo");
-    ayuda->setAlignment(Qt::AlignCenter);
+    botonModo = new QPushButton();
+    botonModo->setObjectName("botonLink");
+    botonModo->setCursor(Qt::PointingHandCursor);
+    botonModo->setFlat(true);
 
     l->addWidget(titulo);
-    l->addWidget(sub);
+    l->addWidget(subtitulo);
     l->addSpacing(8);
     l->addWidget(usuario);
     l->addWidget(clave);
-    l->addWidget(boton);
-    l->addWidget(ayuda);
+    l->addWidget(confirmar);
+    l->addWidget(botonPrincipal);
+    l->addWidget(botonModo);
 
     externo->addStretch();
     externo->addWidget(tarjeta, 0, Qt::AlignHCenter);
     externo->addStretch();
 
-    connect(boton, &QPushButton::clicked, [this]() { intentarIngreso(); });
-    connect(usuario, &QLineEdit::returnPressed, [this]() { intentarIngreso(); });
-    connect(clave, &QLineEdit::returnPressed, [this]() { intentarIngreso(); });
+    connect(botonPrincipal, &QPushButton::clicked, [this]() { intentarIngreso(); });
+    connect(botonModo, &QPushButton::clicked, [this]() { alternarModo(); });
+    connect(usuario, &QLineEdit::returnPressed, [this]() { clave->setFocus(); });
+    connect(clave, &QLineEdit::returnPressed, [this]() {
+        if (modoRegistro) confirmar->setFocus(); else intentarIngreso();
+    });
+    connect(confirmar, &QLineEdit::returnPressed, [this]() { intentarIngreso(); });
+
+    actualizarModo();
+}
+
+void PantallaLogin::actualizarModo() {
+    confirmar->setVisible(modoRegistro);
+    if (modoRegistro) {
+        subtitulo->setText("Crear cuenta: elija su usuario y contraseña");
+        botonPrincipal->setText("Crear cuenta");
+        botonModo->setText("¿Ya tiene cuenta? Ingresar");
+    } else {
+        subtitulo->setText("Bienvenido. Ingrese usuario y contraseña");
+        botonPrincipal->setText("Ingresar");
+        botonModo->setText("¿No tiene cuenta? Crear una");
+    }
+}
+
+void PantallaLogin::alternarModo() {
+    modoRegistro = !modoRegistro;
+    clave->clear();
+    confirmar->clear();
+    actualizarModo();
 }
 
 void PantallaLogin::limpiar() {
+    modoRegistro = false;
     usuario->clear();
     clave->clear();
+    confirmar->clear();
+    actualizarModo();
     usuario->setFocus();
 }
 
 void PantallaLogin::intentarIngreso() {
-    // Usuarios de ejemplo. Luego se conectara con Cliente / Persistencia.
-    struct UsuarioDemo { QString usuario; QString clave; QString nombre; };
-    const UsuarioDemo usuarios[] = {
-        {"admin", "admin123", "Administrador"},
-        {"cliente", "1234", "Cliente"}
-    };
-
     QString u = usuario->text().trimmed();
     QString c = clave->text();
 
@@ -78,13 +102,24 @@ void PantallaLogin::intentarIngreso() {
         mostrarError(this, "Ingrese usuario y contraseña.");
         return;
     }
-    for (const auto& x : usuarios) {
-        if (x.usuario == u && x.clave == c) {
-            QString nombre = x.nombre;
-            limpiar();
-            alIngresar(nombre);
+
+    if (modoRegistro) {
+        if (c != confirmar->text()) {
+            mostrarError(this, "Las contraseñas no coinciden.");
+            return;
+        }
+        QString error;
+        if (!gestor.registrar(u, c, error)) {
+            mostrarError(this, error);
+            return;
+        }
+    } else {
+        if (!gestor.validar(u, c)) {
+            mostrarError(this, "Usuario o contraseña incorrectos.");
             return;
         }
     }
-    mostrarError(this, "Usuario o contraseña incorrectos.");
+
+    limpiar();
+    alIngresar(u);
 }

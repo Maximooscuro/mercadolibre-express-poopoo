@@ -28,6 +28,9 @@ QPushButton#botonNav:checked { background: #2D3277; color: white; }
 QPushButton#botonSalir { background: transparent; color: #2D3277; border: 1px solid #2D3277; }
 QPushButton#botonSalir:hover { background: rgba(45, 50, 119, 0.12); }
 
+QPushButton#botonLink { background: transparent; color: #2D3277; font-weight: 600; padding: 4px; }
+QPushButton#botonLink:hover { text-decoration: underline; background: transparent; }
+
 QLineEdit, QSpinBox, QComboBox {
     background: white; border: 1px solid #BBBBBB; border-radius: 6px; padding: 6px 10px;
 }

@@ -57,7 +57,7 @@ VentanaPrincipal::VentanaPrincipal(QWidget* parent) : QWidget(parent) {
     saludo->setObjectName("saludo");
     barra->addWidget(saludo);
 
-    auto* salir = new QPushButton("Cerrar sesión");
+    auto* salir = new QPushButton("Cambiar de usuario");
     salir->setObjectName("botonSalir");
     salir->setCursor(Qt::PointingHandCursor);
     barra->addWidget(salir);
