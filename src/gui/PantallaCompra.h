@@ -4,7 +4,7 @@
 #include <QLabel>
 #include <functional>
 #include <vector>
-#include "ProductoDemo.h"
+#include "ModeloGui.h"
 
 class PantallaCompra : public QWidget {
 public:

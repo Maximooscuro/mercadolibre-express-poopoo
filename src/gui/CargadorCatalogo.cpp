@@ -1,10 +1,14 @@
 #include "CargadorCatalogo.h"
+#include "ProductoFisico.h"
+#include "ProductoDigital.h"
 #include <QCoreApplication>
 #include <QDir>
 #include <QFile>
 #include <QTextStream>
 #include <QStringConverter>
 #include <QStringList>
+#include <exception>
+#include <string>
 
 QString buscarArchivo(const QString& rutaRelativa) {
     QDir dir(QCoreApplication::applicationDirPath());
@@ -15,8 +19,8 @@ QString buscarArchivo(const QString& rutaRelativa) {
     return QString();
 }
 
-std::vector<ProductoDemo> cargarCatalogo(const QString& rutaRelativa, QString& error) {
-    std::vector<ProductoDemo> productos;
+std::vector<Producto*> cargarCatalogo(const QString& rutaRelativa, QString& error) {
+    std::vector<Producto*> productos;
     error.clear();
 
     QString ruta = buscarArchivo(rutaRelativa);
@@ -40,18 +44,30 @@ std::vector<ProductoDemo> cargarCatalogo(const QString& rutaRelativa, QString& e
         if (linea.isEmpty() || linea.startsWith('#')) continue;
 
         QStringList c = linea.split('|');
-        if (c.size() < 6) { ++invalidas; continue; }
+        if (c.size() < 8) { ++invalidas; continue; }
 
-        bool okPrecio = false, okStock = false;
-        double precio = c[4].trimmed().toDouble(&okPrecio);
+        bool okPrecio = false, okStock = false, okNum = false;
+        float precio = c[4].trimmed().toFloat(&okPrecio);
         int stock = c[5].trimmed().toInt(&okStock);
-        if (!okPrecio || !okStock) { ++invalidas; continue; }
+        float numero = c[6].trimmed().toFloat(&okNum);
+        if (!okPrecio || !okStock || !okNum) { ++invalidas; continue; }
 
-        QString tipo = (c[0].trimmed().toUpper() == "FISICO") ? "Físico" : "Digital";
-        productos.push_back({c[1].trimmed(), c[2].trimmed(), tipo, precio, stock});
+        std::string cod = c[1].trimmed().toStdString();
+        std::string nom = c[2].trimmed().toStdString();
+        std::string desc = c[3].trimmed().toStdString();
+        std::string extra = c[7].trimmed().toStdString();
+
+        try {
+            if (c[0].trimmed().toUpper() == "FISICO")
+                productos.push_back(new ProductoFisico(cod, nom, desc, precio, stock, numero, extra));
+            else
+                productos.push_back(new ProductoDigital(cod, nom, desc, precio, stock, numero, extra));
+        } catch (const std::exception&) {
+            ++invalidas;   // el constructor del producto rechazo los datos
+        }
     }
 
     if (invalidas > 0)
-        error = QString::number(invalidas) + " línea(s) del catálogo tenían formato inválido y se omitieron.";
+        error = QString::number(invalidas) + " línea(s) del catálogo eran inválidas y se omitieron.";
     return productos;
 }

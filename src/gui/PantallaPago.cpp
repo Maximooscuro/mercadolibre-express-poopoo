@@ -1,64 +1,78 @@
 #include "PantallaPago.h"
-#include "Mensajes.h"
-#include "MetodoPago.h"      // de include/ (interfaz del lider)
-#include "Excepciones.h"     // de include/ (header-only)
 #include <QVBoxLayout>
 #include <QPushButton>
-#include <QMessageBox>
-#include <exception>
-#include <string>
+#include <QStringList>
 
-namespace {
-// Pago de prueba: hereda de MetodoPago para demostrar polimorfismo sin esperar al Backend.
-// Se reemplaza por TarjetaCredito / TransferenciaBancaria cuando existan sus .cpp.
-class PagoFalso : public MetodoPago {
-public:
-    explicit PagoFalso(std::string nombre) : nombre(nombre) {}
-    bool procesarPago(float monto) override {
-        if (monto <= 0) throw MontoInvalidoException("Monto de pago invalido");
-        return true;
-    }
-    std::string getNombreMetodo() const override { return nombre; }
-private:
-    std::string nombre;
-};
-}
-
-PantallaPago::PantallaPago(std::function<void()> pagado, QWidget* parent)
-    : QWidget(parent), alPagado(pagado) {
+PantallaPago::PantallaPago(std::function<void(const DatosPago&)> funcPagar,
+                           std::function<void()> recargar, QWidget* parent)
+    : QWidget(parent), alPagar(funcPagar), alRecargar(recargar) {
     auto* layout = new QVBoxLayout(this);
 
     etiquetaTotal = new QLabel("Total a pagar: $0");
     layout->addWidget(etiquetaTotal);
 
-    layout->addWidget(new QLabel("Metodo de pago:"));
+    layout->addWidget(new QLabel("Método de pago:"));
     metodo = new QComboBox();
-    metodo->addItems(QStringList{"Tarjeta de credito", "Transferencia bancaria"});
+    metodo->addItems(QStringList{"Tarjeta de crédito", "Transferencia bancaria"});
     layout->addWidget(metodo);
+
+    dato1 = new QLineEdit();
+    dato2 = new QLineEdit();
+    dato3 = new QLineEdit();
+    dato4 = new QLineEdit();
+    layout->addWidget(dato1);
+    layout->addWidget(dato2);
+    layout->addWidget(dato3);
+    layout->addWidget(dato4);
 
     auto* boton = new QPushButton("Pagar");
     layout->addWidget(boton);
+
+    auto* recargarBtn = new QPushButton("Recargar saldo (+$100.000)");
+    recargarBtn->setObjectName("botonLink");
+    layout->addWidget(recargarBtn);
     layout->addStretch();
 
+    connect(metodo, &QComboBox::currentIndexChanged, [this](int) { cambiarMetodo(); });
     connect(boton, &QPushButton::clicked, [this]() { pagar(); });
+    connect(recargarBtn, &QPushButton::clicked, [this]() { alRecargar(); });
+
+    cambiarMetodo();
 }
 
-void PantallaPago::setTotal(double nuevoTotal) {
-    total = nuevoTotal;
+void PantallaPago::cambiarMetodo() {
+    if (metodo->currentIndex() == 0) {
+        dato1->setPlaceholderText("Número de tarjeta (16 dígitos)");
+        dato2->setPlaceholderText("Titular");
+        dato3->setPlaceholderText("Vencimiento (MM/AA)");
+        dato4->setPlaceholderText("CVV (3 dígitos)");
+        dato3->setVisible(true);
+        dato4->setVisible(true);
+    } else {
+        dato1->setPlaceholderText("Banco");
+        dato2->setPlaceholderText("Número de cuenta");
+        dato3->setVisible(false);
+        dato4->setVisible(false);
+    }
+}
+
+void PantallaPago::setTotal(double total) {
     etiquetaTotal->setText("Total a pagar: $" + QString::number(total, 'f', 0));
 }
 
+void PantallaPago::limpiar() {
+    dato1->clear();
+    dato2->clear();
+    dato3->clear();
+    dato4->clear();
+}
+
 void PantallaPago::pagar() {
-    PagoFalso pago(metodo->currentText().toStdString());
-    MetodoPago& ref = pago;   // se usa a traves de la interfaz: polimorfismo
-    try {
-        ref.procesarPago(static_cast<float>(total));
-        QMessageBox::information(this, "Pago",
-            "Pago exitoso con " + QString::fromStdString(ref.getNombreMetodo()));
-        alPagado();
-    } catch (const std::exception& e) {
-        mostrarError(this, QString::fromUtf8(e.what()));
-    } catch (...) {
-        mostrarError(this, "Ocurrio un error al procesar el pago.");
-    }
+    DatosPago d;
+    d.metodo = metodo->currentIndex();
+    d.dato1 = dato1->text().trimmed();
+    d.dato2 = dato2->text().trimmed();
+    d.dato3 = dato3->text().trimmed();
+    d.dato4 = dato4->text().trimmed();
+    alPagar(d);   // VentanaPrincipal arma el pedido, cobra y atrapa los errores
 }

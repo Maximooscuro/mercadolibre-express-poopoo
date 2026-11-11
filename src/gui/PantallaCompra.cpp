@@ -12,7 +12,7 @@ PantallaCompra::PantallaCompra(std::function<void(int)> quitar,
     auto* layout = new QVBoxLayout(this);
 
     tabla = new QTableWidget(0, 3);
-    tabla->setHorizontalHeaderLabels(QStringList{"Producto", "Cantidad", "Subtotal"});
+    tabla->setHorizontalHeaderLabels(QStringList{"Producto", "Cantidad", "Subtotal (con envío)"});
     tabla->setSelectionBehavior(QAbstractItemView::SelectRows);
     tabla->setSelectionMode(QAbstractItemView::SingleSelection);
     tabla->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -46,11 +46,12 @@ void PantallaCompra::actualizar(const std::vector<ItemCarrito>& carrito) {
     double suma = 0;
     for (int i = 0; i < static_cast<int>(carrito.size()); ++i) {
         const ItemCarrito& it = carrito[i];
-        double subtotal = it.producto.precio * it.cantidad;
+        // Polimorfismo: cada tipo de producto calcula su costo (el fisico suma envio)
+        double subtotal = it.producto->calcularCostoTotal(it.cantidad);
         suma += subtotal;
-        tabla->setItem(i, 0, new QTableWidgetItem(it.producto.nombre));
+        tabla->setItem(i, 0, new QTableWidgetItem(QString::fromStdString(it.producto->getNombre())));
         tabla->setItem(i, 1, new QTableWidgetItem(QString::number(it.cantidad)));
         tabla->setItem(i, 2, new QTableWidgetItem("$" + QString::number(subtotal, 'f', 0)));
     }
-    total->setText("Total: $" + QString::number(suma, 'f', 0));
+    total->setText("Total (incluye envíos): $" + QString::number(suma, 'f', 0));
 }

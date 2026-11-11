@@ -5,18 +5,22 @@
 #include <QLabel>
 #include <functional>
 #include <vector>
-#include "ProductoDemo.h"
+#include "Producto.h"
 
+// Muestra el catalogo de productos reales. Esta pantalla es la duena de los
+// productos: los crea al cargar el archivo y los destruye en su destructor.
 class PantallaCatalogo : public QWidget {
 public:
-    using Callback = std::function<bool(const ProductoDemo&, int)>;
+    using Callback = std::function<bool(Producto*, int)>;
     explicit PantallaCatalogo(Callback alAgregar, QWidget* parent = nullptr);
-    void descontarStock(const std::vector<ItemCarrito>& items);
+    ~PantallaCatalogo() override;
+
+    void refrescar();   // vuelve a dibujar la tabla (por ejemplo, tras bajar el stock)
 
 private:
     void agregar();
 
-    std::vector<ProductoDemo> datos;
+    std::vector<Producto*> productos;
     QTableWidget* tabla;
     QSpinBox* cantidad;
     QLabel* estado;
