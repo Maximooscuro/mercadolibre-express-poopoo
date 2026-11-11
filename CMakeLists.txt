@@ -10,7 +10,7 @@ add_executable(mercadolibrepoo
         src/core/Cliente.cpp
         src/core/Categoria.cpp
         src/core/DetallePedido.cpp
-        src/core/GestorArchivos.cpp
+        src/persistence/GestorArchivos.cpp
         src/core/MenuController.cpp
         src/core/Pedido.cpp
         src/core/Producto.cpp
