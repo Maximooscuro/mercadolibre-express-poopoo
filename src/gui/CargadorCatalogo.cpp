@@ -1,4 +1,5 @@
 #include "CargadorCatalogo.h"
+#include "GestorArchivos.h"      // modulo de Persistencia (include/)
 #include "ProductoFisico.h"
 #include "ProductoDigital.h"
 #include <QCoreApplication>
@@ -19,26 +20,18 @@ QString buscarArchivo(const QString& rutaRelativa) {
     return QString();
 }
 
-std::vector<Producto*> cargarCatalogo(const QString& rutaRelativa, QString& error) {
+namespace {
+// Lector de respaldo: se salta las lineas invalidas en vez de abortar todo.
+std::vector<Producto*> leerTolerante(const QString& ruta, int& invalidas) {
     std::vector<Producto*> productos;
-    error.clear();
-
-    QString ruta = buscarArchivo(rutaRelativa);
-    if (ruta.isEmpty()) {
-        error = "No se encontró " + rutaRelativa + ".";
-        return productos;
-    }
+    invalidas = 0;
 
     QFile archivo(ruta);
-    if (!archivo.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        error = "No se pudo abrir " + ruta + ".";
-        return productos;
-    }
+    if (!archivo.open(QIODevice::ReadOnly | QIODevice::Text)) return productos;
 
     QTextStream in(&archivo);
     in.setEncoding(QStringConverter::Utf8);
 
-    int invalidas = 0;
     while (!in.atEnd()) {
         QString linea = in.readLine().trimmed();
         if (linea.isEmpty() || linea.startsWith('#')) continue;
@@ -63,11 +56,43 @@ std::vector<Producto*> cargarCatalogo(const QString& rutaRelativa, QString& erro
             else
                 productos.push_back(new ProductoDigital(cod, nom, desc, precio, stock, numero, extra));
         } catch (const std::exception&) {
-            ++invalidas;   // el constructor del producto rechazo los datos
+            ++invalidas;
         }
     }
+    return productos;
+}
+}
 
+std::vector<Producto*> cargarCatalogo(const QString& rutaRelativa, QString& error) {
+    std::vector<Producto*> productos;
+    error.clear();
+
+    QString ruta = buscarArchivo(rutaRelativa);
+    if (ruta.isEmpty()) {
+        error = "No se encontró " + rutaRelativa + ".";
+        return productos;
+    }
+
+    // 1) Primero el modulo de Persistencia: es el mismo codigo que usa la consola
+    QString motivo;
+    try {
+        GestorArchivos gestor;
+        productos = gestor.cargarCatalogoTexto(ruta.toStdString());
+        error = "Catálogo leído de " + ruta + " con Persistencia (" +
+                QString::number(productos.size()) + " productos).";
+        return productos;
+    } catch (const std::exception& e) {
+        motivo = QString::fromUtf8(e.what());
+    }
+
+    // 2) Si Persistencia rechaza el archivo (por ejemplo, una linea mal escrita),
+    //    se usa el lector de respaldo para no dejar el catalogo vacio.
+    int invalidas = 0;
+    productos = leerTolerante(ruta, invalidas);
+    error = "Persistencia no pudo leer " + ruta + " (" + motivo + "). Lector de respaldo: " +
+            QString::number(productos.size()) + " productos";
     if (invalidas > 0)
-        error = QString::number(invalidas) + " línea(s) del catálogo eran inválidas y se omitieron.";
+        error += ", " + QString::number(invalidas) + " línea(s) inválidas omitidas";
+    error += ".";
     return productos;
 }

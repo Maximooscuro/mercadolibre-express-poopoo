@@ -1,5 +1,5 @@
 #pragma once
-// Hoja de estilos (QSS) de toda la aplicacion. Colores tipo MercadoLibre.
+// Hoja de estilos (QSS) de toda la aplicacion. Colores tipo MercadoLibre
 inline const char* estilosApp() {
     return R"QSS(
 QWidget { font-family: "Segoe UI"; font-size: 14px; color: #333333; }

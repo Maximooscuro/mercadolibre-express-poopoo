@@ -12,5 +12,6 @@ QString buscarArchivo(const QString& rutaRelativa);
 // Formato por linea:
 // TIPO|codigo|nombre|descripcion|precio|stock|peso_o_tamano|dimensiones_o_url
 // Lineas vacias o que empiezan con # se ignoran.
-// 'error' queda vacio si todo salio bien; si no, explica que paso.
+// 'error' devuelve un informe: de que archivo se leyo y cuantos productos salieron
+// (o por que fallo). La pantalla lo muestra bajo la tabla.
 std::vector<Producto*> cargarCatalogo(const QString& rutaRelativa, QString& error);

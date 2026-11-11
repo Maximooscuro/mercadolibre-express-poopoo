@@ -37,6 +37,7 @@ if(Qt6_FOUND)
             src/gui/PantallaPago.cpp
             src/gui/PantallaReportes.cpp
             src/gui/CargadorCatalogo.cpp
+            src/persistence/GestorArchivos.cpp
             src/core/Cliente.cpp
             src/core/Categoria.cpp
             src/core/DetallePedido.cpp
@@ -55,4 +56,6 @@ endif()
 add_custom_command(TARGET mercadolibrepoo POST_BUILD
         COMMAND powershell -ExecutionPolicy Bypass -File "${CMAKE_SOURCE_DIR}/sign.ps1" "$<TARGET_FILE:mercadolibrepoo>"
         COMMENT "Firmando ejecutable con certificado local..."
-)   
+)
+
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
