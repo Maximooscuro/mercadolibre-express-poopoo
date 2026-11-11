@@ -1,6 +1,6 @@
 //
 // Created by maxim on 10/11/2026.
-// librerias para leer:
+//
 #pragma once
 #include <vector>
 #include <string>
@@ -13,6 +13,7 @@
 #include "TransferenciaBancaria.h"
 #include "ServicioNotificacion.h"
 #include "Excepciones.h"
+#include "GestorArchivos.h"
 
 class MenuController {
     private:
@@ -21,6 +22,13 @@ class MenuController {
     Cliente* clienteSesionActual = nullptr;
     std::vector<Producto*> catalogo;
     std::vector<Categoria*> categorias;
+    //persistencia
+    GestorArchivos gestor;
+    std::vector<Pedido*> historialPedidos;
+    std::string dirDatos = "data/";
+    bool cargaFallida = false;
+    void cargarDatos();
+    void guardarDatos();
     //funciones de la categoria
     void mostrarMenuPrincipal() const;
     void gestionarProductos();
@@ -31,8 +39,8 @@ class MenuController {
     void cambiarClienteSesion();
     void eliminarCliente();
     //funciones auxiliares
-    int leerEnteroSeguro(int minVal, int maxVal); //para opciones muy util
-    float leerFlotantePositivo(); // para asignar dinero o tamaños
+    int leerEnteroSeguro(int minVal, int maxVal);
+    float leerFlotantePositivo();
 public:
     MenuController();
     ~MenuController();
