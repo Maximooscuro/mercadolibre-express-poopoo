@@ -40,7 +40,7 @@ float MenuController::leerFlotantePositivo() {
 //red magic logic:
 
 MenuController::MenuController(){
-    listaClientes.push_back(Cliente("Samuel Falsuy", "samuel@unillanos.edu.co", "Villavicencio", 500000.0f));
+    listaClientes.push_back(Cliente("Samuel Sapuy", "se.stoloza@unillanos.edu.co", "Villavicencio", 500000.0f));
     clienteSesionActual = &listaClientes[0];
     catalogo.push_back(new ProductoFisico("P001", "Audifonos Gamer RGB", "Inalambricos", 120000.0f, 10, 0.4f, "15x10x5"));
     Categoria* catTecnologia = new Categoria("C01", "Tecnologia");

@@ -45,6 +45,7 @@ if(Qt6_FOUND)
             src/core/ServicioNotificacion.cpp
             src/core/TarjetaCredito.cpp
             src/core/TransferenciaBancaria.cpp)
-    target_include_directories(gui_prueba PRIVATE include src/gui)
+
+ target_include_directories(gui_prueba PRIVATE include src/gui)
     target_link_libraries(gui_prueba PRIVATE Qt6::Widgets)
 endif()
