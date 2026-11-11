@@ -16,7 +16,7 @@ private:
     std::string estado; // "Pendiente", "Pagado", "Cancelado"
     float montoTotal;
 
-    // Composición estricta: Pedido es dueño exclusivo de la memoria de sus detalles
+    // Pedido es dueño exclusivo de la memoria de sus detalles
     std::vector<DetallePedido*> detalles;
 
 public:
