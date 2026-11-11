@@ -1,6 +1,6 @@
 //
 // Created by maxim on 10/11/2026.
-//
+// librerias para leer:
 #pragma once
 #include <vector>
 #include <string>
@@ -31,8 +31,8 @@ class MenuController {
     void cambiarClienteSesion();
     void eliminarCliente();
     //funciones auxiliares
-    int leerEnteroSeguro(int minVal, int maxVal);
-    float leerFlotantePositivo();
+    int leerEnteroSeguro(int minVal, int maxVal); //para opciones muy util
+    float leerFlotantePositivo(); // para asignar dinero o tamaños
 public:
     MenuController();
     ~MenuController();
