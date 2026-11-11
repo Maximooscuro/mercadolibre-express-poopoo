@@ -58,3 +58,10 @@ string Pedido::getNumeroSeguimiento() const { return this->numeroSeguimiento; }
 string Pedido::getEstado() const { return this->estado; }
 float Pedido::getMontoTotal() const { return this->montoTotal; }
 const vector<DetallePedido*>& Pedido::getDetalles() const { return this->detalles; }
+string Pedido::getFecha() const {
+    return this->fecha;
+}
+
+void Pedido::setEstado(const string& nuevoEstado) {
+    this->estado = nuevoEstado;
+}

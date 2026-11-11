@@ -10,6 +10,8 @@ add_executable(mercadolibrepoo
         src/core/Cliente.cpp
         src/core/Categoria.cpp
         src/core/DetallePedido.cpp
+        src/persistence/GestorArchivos.cpp
+        src/core/MenuController.cpp
         src/core/Pedido.cpp
         src/core/Producto.cpp
         src/core/ProductoDigital.cpp
@@ -46,6 +48,11 @@ if(Qt6_FOUND)
             src/core/TarjetaCredito.cpp
             src/core/TransferenciaBancaria.cpp)
 
- target_include_directories(gui_prueba PRIVATE include src/gui)
+    target_include_directories(gui_prueba PRIVATE include src/gui)
     target_link_libraries(gui_prueba PRIVATE Qt6::Widgets)
 endif()
+
+add_custom_command(TARGET mercadolibrepoo POST_BUILD
+        COMMAND powershell -ExecutionPolicy Bypass -File "${CMAKE_SOURCE_DIR}/sign.ps1" "$<TARGET_FILE:mercadolibrepoo>"
+        COMMENT "Firmando ejecutable con certificado local..."
+)   
