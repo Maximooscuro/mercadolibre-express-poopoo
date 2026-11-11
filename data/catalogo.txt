@@ -1,5 +1,5 @@
+# TIPO|codigo|nombre|descripcion|precio|stock|peso(kg)_o_tamano(MB)|dimensiones_o_url
 FISICO|P001|Mouse|Mouse inalambrico|45000|20|0.15|10x6x4
 FISICO|P002|Teclado|Teclado mecanico|120000|10|0.9|44x14x4
 DIGITAL|P003|Ebook C++|Guia de POO|30000|999|5.2|http://descarga.com/ebook
 DIGITAL|P004|Curso Git|Curso en video|80000|999|850|http://descarga.com/git
-FISICO|N001|prueba fisica de persistencia|test de persistencia|67|67|67|67x67x67
